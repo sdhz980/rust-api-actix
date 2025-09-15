@@ -1,0 +1,19 @@
+[package]
+name = "rust-api-actix"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+actix-cors = "0.7.1"
+actix-web = "4.11.0"
+bcrypt = "0.17.1"
+chrono = { version = "0.4.42", features = ["serde"] }
+dotenv = "0.15.0"
+env_logger = "0.11.8"
+jsonwebtoken = "9.3.1"
+log = "0.4.28"
+serde = "1.0.223"
+sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "mysql", "chrono", "uuid", "migrate"] }
+tokio = { version = "1.47.1", features = ["full"] }
+uuid = { version = "1.18.1", features = ["v4", "serde"] }
+validator = { version = "0.20.0", features = ["derive"] }
