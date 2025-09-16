@@ -9,7 +9,7 @@ mod services;
 mod utils;
 
 use std::env;
-use actix_web::{ middleware::Logger, App, HttpServer };
+use actix_web::{ middleware::Logger, web, App, HttpServer };
 use sqlx::migrate;
 use dotenv::dotenv;
 
@@ -32,7 +32,11 @@ async fn main() -> std::io::Result<()> {
     println!("SERVER STARTING ON HTTP://{}:{}", host, port);
 
     HttpServer::new(move || {
-        App::new().wrap(Logger::default()).wrap(middleware::cors::cors()).configure(routes::config)
+        App::new()
+            .app_data(web::Data::new(pool.clone()))
+            .wrap(Logger::default())
+            .wrap(middleware::cors::cors())
+            .configure(routes::config)
     })
         .bind(format!("{}:{}", host, port))?
         .run().await
