@@ -4,5 +4,4 @@ use crate::middleware::auth_middleware;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/todo").wrap(auth_middleware::Auth));
-    todo!()
 }

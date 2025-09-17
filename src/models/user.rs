@@ -43,13 +43,15 @@ fn is_password_valid(s: &str) -> Result<(), ValidationError> {
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateUserRequest {
-    #[validate(length(min = 5, max = 50))]
+    #[validate(length(min = 5, max = 50, message = "Username require min 5 and max 5 characters."))]
     pub username: String,
 
-    #[validate(email)]
+    #[validate(email(message = "Email invalid."))]
     pub email: String,
 
-    #[validate(custom(function = "is_password_valid"))]
+    #[validate(
+        custom(function = "is_password_valid", message = "Password does not meet requirements.")
+    )]
     pub password: String,
 }
 

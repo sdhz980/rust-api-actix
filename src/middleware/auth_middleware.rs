@@ -5,10 +5,10 @@ use actix_web::body::EitherBody;
 use actix_web::dev::{ forward_ready, Service, ServiceResponse, Transform };
 use actix_web::http::header::{ AUTHORIZATION };
 use actix_web::http::Method;
-use actix_web::{ HttpMessage, HttpResponse };
+use actix_web::{ HttpMessage, ResponseError };
 use actix_web::{ dev::ServiceRequest, Error };
-use serde_json::json;
 
+use crate::errors::app_error::AppError;
 use crate::utils::jwt::Claims;
 use crate::{ utils::jwt::verify_jwt, constants };
 pub struct Auth;
@@ -103,15 +103,7 @@ impl<S, B> Service<ServiceRequest>
         if !authenticate_pass {
             // early return: buat ServiceResponse dan ubah body jadi Right(EitherBody)
             let (request, _pl) = req.into_parts();
-            let response = HttpResponse::BadRequest().json(
-                json!({
-                    "error": {
-                        "code": "BAD_REQUEST",
-                        "message": "Request cannot be procceded.",
-                        "status": 400
-                    }
-                })
-            );
+            let response = AppError::Unauthorized("Expired token.".to_string()).error_response();
             let srv_resp = ServiceResponse::new(request, response).map_into_right_body();
             return Box::pin(async move { Ok(srv_resp) });
         }

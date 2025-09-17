@@ -10,7 +10,7 @@ mod utils;
 mod constants;
 
 use std::env;
-use actix_web::{ http::StatusCode, middleware::{ ErrorHandlers, Logger }, web, App, HttpServer };
+use actix_web::{ middleware::{ ErrorHandlers, Logger }, web, App, HttpServer };
 use sqlx::migrate;
 use dotenv::dotenv;
 
@@ -38,19 +38,9 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(middleware::cors_middleware::cors())
             .wrap(
-                ErrorHandlers::new()
-                    .handler(
-                        StatusCode::NOT_FOUND,
-                        middleware::error_middleware::handle_default_errors
-                    )
-                    .handler(
-                        StatusCode::METHOD_NOT_ALLOWED,
-                        middleware::error_middleware::handle_default_errors
-                    )
-                    .handler(
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        middleware::error_middleware::handle_default_errors
-                    )
+                ErrorHandlers::new().default_handler(
+                    middleware::error_middleware::handle_default_errors
+                )
             )
             .configure(routes::config)
     })

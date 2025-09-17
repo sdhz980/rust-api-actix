@@ -52,7 +52,7 @@ impl UserRepository {
         Ok(user)
     }
 
-    pub async fn find_by_id(pool: &DbPool, id: u64) -> AppResult<Option<User>> {
+    pub async fn _find_by_id(pool: &DbPool, id: u64) -> AppResult<Option<User>> {
         let user = query_as::<_, User>(
             r#"
                 SELECT * FROM users where id = ?
@@ -64,7 +64,7 @@ impl UserRepository {
         Ok(user)
     }
 
-    pub async fn list(pool: &DbPool, limit: i64, offset: i64) -> AppResult<Vec<User>> {
+    pub async fn _list(pool: &DbPool, limit: i64, offset: i64) -> AppResult<Vec<User>> {
         let user = query_as::<_, User>(
             r#"
                 SELECT * FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?

@@ -14,7 +14,9 @@ pub struct Claims {
 }
 
 pub fn create_jwt(user_id: i64) -> AppResult<String> {
-    let secret = env::var("JWT_SECRET").map_err(|_| AppError::InternalServer)?;
+    let secret = env
+        ::var("JWT_SECRET")
+        .map_err(|err| AppError::InternalServerError(err.to_string()))?;
 
     let now = Utc::now();
     let expire = now + Duration::hours(24);
@@ -25,13 +27,15 @@ pub fn create_jwt(user_id: i64) -> AppResult<String> {
         iat: now.timestamp(),
     };
 
-    encode(&Header::default(), &claims, &EncodingKey::from_secret(secret.as_bytes())).map_err(
-        |_| AppError::InternalServer
+    encode(&Header::default(), &claims, &EncodingKey::from_secret(secret.as_bytes())).map_err(|err|
+        AppError::InternalServerError(err.to_string())
     )
 }
 
 pub fn verify_jwt(token: &str) -> AppResult<Claims> {
-    let secret = env::var("JWT_SECRET").map_err(|_| AppError::InternalServer)?;
+    let secret = env
+        ::var("JWT_SECRET")
+        .map_err(|err| AppError::InternalServerError(err.to_string()))?;
 
     decode::<Claims>(
         token,
@@ -39,5 +43,5 @@ pub fn verify_jwt(token: &str) -> AppResult<Claims> {
         &Validation::new(jsonwebtoken::Algorithm::HS256)
     )
         .map(|data| data.claims)
-        .map_err(|_| AppError::Authorization("Invalid token".to_string()))
+        .map_err(|_| AppError::Unauthorized("Invalid token".to_string()))
 }

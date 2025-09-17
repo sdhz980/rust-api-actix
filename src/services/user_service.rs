@@ -12,14 +12,14 @@ pub struct UserService;
 
 impl UserService {
     pub async fn create_user(pool: &DbPool, request: CreateUserRequest) -> AppResult<String> {
-        request.validate().map_err(|e| AppError::Validation(format!("Validation failed: {}", e)))?;
+        request.validate().map_err(|e| AppError::BadRequest(format!("\n{}", e)))?;
 
         if UserRepository::find_by_email(pool, &request.email).await?.is_some() {
-            return Err(AppError::Validation("Email already exists".to_string()));
+            return Err(AppError::UserAlreadyExists("Email already exist".to_string()));
         }
 
         if UserRepository::find_by_username(pool, &request.username).await?.is_some() {
-            return Err(AppError::Validation("Username already exists".to_string()));
+            return Err(AppError::UserAlreadyExists("Username already exist".to_string()));
         }
 
         let password_hash = hash_password(&request.password)?;
@@ -35,11 +35,11 @@ impl UserService {
         password: &str
     ) -> AppResult<String> {
         let user = UserRepository::find_by_email(pool, email).await?.ok_or_else(||
-            AppError::Authentication("Invalid credentials".to_string())
+            AppError::InvalidUserData("Invalid credentials".to_string())
         )?;
 
         if !verify_password(password, &user.password)? {
-            return Err(AppError::Authentication("Invalid credentials".to_string()));
+            return Err(AppError::InvalidUserData("Invalid credentials".to_string()));
         }
 
         let token = create_jwt(user.id)?;
