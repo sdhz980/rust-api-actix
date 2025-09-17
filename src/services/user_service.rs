@@ -14,11 +14,11 @@ impl UserService {
     pub async fn create_user(pool: &DbPool, request: CreateUserRequest) -> AppResult<String> {
         request.validate().map_err(|e| AppError::Validation(format!("Validation failed: {}", e)))?;
 
-        if let Some(_) = UserRepository::find_by_email(pool, &request.email).await? {
+        if UserRepository::find_by_email(pool, &request.email).await?.is_some() {
             return Err(AppError::Validation("Email already exists".to_string()));
         }
 
-        if let Some(_) = UserRepository::find_by_username(pool, &request.username).await? {
+        if UserRepository::find_by_username(pool, &request.username).await?.is_some() {
             return Err(AppError::Validation("Username already exists".to_string()));
         }
 

@@ -31,7 +31,7 @@ fn is_password_valid(s: &str) -> Result<(), ValidationError> {
         has_whitespace |= c.is_whitespace();
         has_lower |= c.is_lowercase();
         has_upper |= c.is_uppercase();
-        has_digit |= c.is_digit(10);
+        has_digit |= c.is_ascii_digit();
     }
 
     if !(!has_whitespace && has_upper && has_lower && has_digit && s.len() >= 8) {

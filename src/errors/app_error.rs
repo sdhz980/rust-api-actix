@@ -11,7 +11,7 @@ pub enum AppError {
 
     #[error("Authorization error : {0}")] Authorization(String),
 
-    #[error("Not found: {0}")] NotFound(String),
+    #[error("Not found")] NotFound(),
 
     #[error("Internal server error")]
     InternalServer,
@@ -29,11 +29,25 @@ impl ResponseError for AppError {
                 HttpResponse::InternalServerError().json(json!({"error" : msg})),
             AppError::Authorization(msg) =>
                 HttpResponse::InternalServerError().json(json!({"error" : msg})),
-            AppError::NotFound(msg) =>
-                HttpResponse::InternalServerError().json(json!({"error" : msg})),
+            AppError::NotFound() =>
+                HttpResponse::NotFound().json(
+                    json!({
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "message": "The requested resource was not found",
+                        "status": 404
+                    }
+                    })
+                ),
             AppError::InternalServer =>
                 HttpResponse::InternalServerError().json(
-                    json!({"error" : "Internal server error"})
+                    json!({
+                    "error": {
+                        "code": "INTERNAL_SERVER_ERROR",
+                        "message": "An internal server error occurred",
+                        "status": 500
+                        }
+                    })
                 ),
         }
     }

@@ -7,3 +7,4 @@ pub mod middleware;
 pub mod utils;
 pub mod errors;
 pub mod routes;
+pub mod constants;
